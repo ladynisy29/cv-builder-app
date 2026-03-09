@@ -56,6 +56,27 @@ Core goals:
    - tailor output based on job requirements
 4. `components/cv-preview.tsx` renders output and exports PDF.
 
+## Data Flow Map
+
+```mermaid
+flowchart TD
+  A[User Uploads CV PDF] --> B[app/page.tsx]
+  B --> C[POST /api/parse-pdf]
+  C --> D[pdf-parse extracts raw text]
+  D --> B
+
+  E[User Pastes Job Offer] --> B
+  B --> F[POST /api/generate-cv]
+  F --> G[Stage 1: generateObject ParsedCVSchema]
+  G --> H[Stage 2: generateObject TailoredCVSchema]
+  H --> B
+
+  B --> I[components/cv-preview.tsx]
+  I --> J[On-screen CV preview]
+  I --> K[pdf-lib export]
+  K --> L[Download tailored CV PDF]
+```
+
 ## Project Structure
 
 ```text

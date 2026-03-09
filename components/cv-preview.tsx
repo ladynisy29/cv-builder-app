@@ -47,7 +47,7 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
       let y = pageHeight - margin
 
       const darkBlue = rgb(0.169, 0.176, 0.329)
-      const coral = rgb(1, 0.463, 0.361)
+      const black = rgb(0, 0, 0)
       const gray = rgb(0.4, 0.4, 0.45)
 
       const addNewPageIfNeeded = (requiredSpace: number) => {
@@ -73,8 +73,8 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
           x: margin,
           y,
           size: 12,
-          font: helvetica,
-          color: coral,
+          font: helveticaBold,
+          color: black,
         })
         y -= 20
       }
@@ -97,7 +97,7 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
         start: { x: margin, y },
         end: { x: pageWidth - margin, y },
         thickness: 1,
-        color: coral,
+        color: black,
       })
       y -= 20
 
@@ -135,7 +135,7 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
           start: { x: margin, y },
           end: { x: margin + 60, y },
           thickness: 2,
-          color: coral,
+          color: black,
         })
         y -= 14
 
