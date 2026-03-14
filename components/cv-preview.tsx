@@ -222,14 +222,7 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
         y -= 8
       }
 
-      // Divider
-      page.drawLine({
-        start: { x: margin, y },
-        end: { x: pageWidth - margin, y },
-        thickness: 1,
-        color: black,
-      })
-      y -= 20
+      y -= 12
 
       // Summary
       if (data.summary) {
@@ -245,8 +238,8 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
 
         page.drawLine({
           start: { x: margin, y },
-          end: { x: margin + 45, y },
-          thickness: 2,
+          end: { x: pageWidth - margin, y },
+          thickness: 1,
           color: black,
         })
         y -= 14
@@ -287,8 +280,8 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
 
         page.drawLine({
           start: { x: margin, y },
-          end: { x: margin + 60, y },
-          thickness: 2,
+          end: { x: pageWidth - margin, y },
+          thickness: 1,
           color: black,
         })
         y -= 14
@@ -345,7 +338,8 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
             const primaryPrefix = "• "
             const { leftText, dateText } = splitDateSuffix(item.text)
             const primaryFont = isPrimaryBoldSection ? helveticaBold : helvetica
-            const dateWidth = dateText ? primaryFont.widthOfTextAtSize(dateText, fontSize) : 0
+            const dateFont = helveticaBold
+            const dateWidth = dateText ? dateFont.widthOfTextAtSize(dateText, fontSize) : 0
             const dateGap = dateText ? 12 : 0
             const leftMaxWidth = Math.max(120, contentWidth - dateWidth - dateGap)
 
@@ -363,7 +357,7 @@ export function CVPreview({ data, isGenerating, streamingText }: CVPreviewProps)
                 dateText,
                 pageWidth - margin - dateWidth,
                 leftStartY,
-                primaryFont,
+                dateFont,
                 fontSize,
                 gray
               )
@@ -819,6 +813,22 @@ function splitDateSuffix(text: string): { leftText: string; dateText?: string } 
     const right = trimmed.slice(pipeIndex + 1).trim()
     if (isLikelyDateRange(right) && left) {
       return { leftText: left, dateText: right }
+    }
+  }
+
+  const trailingDateRangeMatch = trimmed.match(
+    /((?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{4}|(?:19|20)\d{2})\s*[–—-]\s*(?:Present|(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\s+\d{4}|(?:19|20)\d{2})))$/i
+  )
+
+  if (trailingDateRangeMatch) {
+    const dateText = trailingDateRangeMatch[1].trim()
+    const leftText = trimmed
+      .slice(0, trailingDateRangeMatch.index)
+      .replace(/[|–—-]\s*$/, "")
+      .trim()
+
+    if (leftText && isLikelyDateRange(dateText)) {
+      return { leftText, dateText }
     }
   }
 
