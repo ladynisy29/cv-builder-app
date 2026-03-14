@@ -24,9 +24,46 @@ interface CVData {
   sections: { heading: string; content: string }[]
 }
 
+interface ParsedCVData {
+  otherSections?: { heading: string; content: string }[]
+}
+
 interface GenerateCvResponse {
-  parsedCv: unknown
+  parsedCv: ParsedCVData
   tailoredCv: CVData
+}
+
+function mergeOnlineProfiles(parsedCv: ParsedCVData, tailoredCv: CVData): CVData {
+  const hasOnlineProfiles = tailoredCv.sections.some((section) =>
+    isOnlineProfilesHeading(section.heading)
+  )
+
+  if (hasOnlineProfiles) {
+    return tailoredCv
+  }
+
+  const onlineProfilesSection = parsedCv.otherSections?.find((section) =>
+    isOnlineProfilesHeading(section.heading)
+  )
+
+  if (!onlineProfilesSection) {
+    return tailoredCv
+  }
+
+  return {
+    ...tailoredCv,
+    sections: [...tailoredCv.sections, onlineProfilesSection],
+  }
+}
+
+function isOnlineProfilesHeading(heading: string): boolean {
+  const normalizedHeading = heading.trim().toLowerCase()
+  return (
+    normalizedHeading === "online profiles" ||
+    normalizedHeading === "online profile" ||
+    normalizedHeading === "profiles" ||
+    normalizedHeading === "links"
+  )
 }
 
 export default function Page() {
@@ -76,7 +113,7 @@ export default function Page() {
       }
 
       const parsed = (await response.json()) as GenerateCvResponse
-      setCvData(parsed.tailoredCv)
+      setCvData(mergeOnlineProfiles(parsed.parsedCv, parsed.tailoredCv))
     } catch (err) {
       console.error(err)
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.")
